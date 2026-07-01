@@ -1,5 +1,9 @@
 name: RSS to Telegram Bot
 
+concurrency:
+  group: rss-bot
+  cancel-in-progress: false
+
 on:
   schedule:
     - cron: '*/15 * * * *'
@@ -32,4 +36,5 @@ jobs:
           git config user.email "actions@github.com"
           git add seen.json
           git commit -m "Update seen list" || echo "No changes to commit"
+          git pull --rebase origin main
           git push
