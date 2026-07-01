@@ -3,7 +3,7 @@ import requests
 import os
 import json
 
-RSS_URL = RSS_URL = "https://www.youtube.com/feeds/videos.xml?channel_id=UCTGISxQbhPWAyczBycJIFP4g"
+RSS_URL = "https://www.youtube.com/feeds/videos.xml?channel_id=UCat6bC0Wrqq9Bcq7EkH_yQw"
 CHAT_ID = "@testandishepahlavi"
 SEEN_FILE = "seen.json"
 
