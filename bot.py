@@ -3,7 +3,7 @@ import requests
 import os
 import json
 
-RSS_URL = https://rss.app/feeds/GtMuIsNLc4lY0KnN.xml
+RSS_URL = "https://rss.app/feeds/GtMuIsNLc4lY0KnN.xml"
 CHAT_ID = "@testandishepahlavi"
 SEEN_FILE = "seen.json"
 
