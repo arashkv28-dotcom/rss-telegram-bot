@@ -27,7 +27,7 @@ def save_json(filename, data):
 
 def send_telegram(title, link):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    text = f"🎬 ویدیوی جدید\n\n{title}\n\n🔗 {link}"
+    text = f"🎬 آشنایی با مفاهیم سیاست\n\n{title}\n\n🔗 {link}"
     response = requests.post(url, data={
         "chat_id": CHAT_ID,
         "text": text
@@ -37,11 +37,28 @@ def send_telegram(title, link):
 
 
 def get_videos(page_token=""):
-    url = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={PLAYLIST_ID}&maxResults=50&key={API_KEY}"
+    url = f"https://www.googleapis.com/youtube/v3/playlistItems"
+    params = {
+        "part": "snippet",
+        "playlistId": PLAYLIST_ID,
+        "maxResults": 50,
+        "key": API_KEY
+    }
     if page_token:
-        url += f"&pageToken={page_token}"
-    response = requests.get(url)
-    return response.json()
+        params["pageToken"] = page_token
+
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    print(f"API Response status: {response.status_code}")
+
+    if "error" in data:
+        print(f"API Error: {data['error']['message']}")
+        return data
+
+    print(f"Total results: {data.get('pageInfo', {}).get('totalResults', 'unknown')}")
+
+    return data
 
 
 def main():
@@ -49,18 +66,27 @@ def main():
     page_token = load_json(PAGE_FILE, {}).get("token", "")
 
     print(f"Playlist: {PLAYLIST_ID}")
+    print(f"Page token: '{page_token}'")
+
     data = get_videos(page_token)
 
-    print(f"Total items in page: {len(data.get('items', []))}")
+    if "error" in data:
+        print("Stopping due to API error")
+        return
+
+    items = data.get("items", [])
+    print(f"Items in this page: {len(items)}")
 
     videos = []
-    for item in data.get("items", []):
+    for item in items:
         title = item["snippet"]["title"]
         video_id = item["snippet"]["resourceId"]["videoId"]
         link = f"https://www.youtube.com/watch?v={video_id}"
 
         if link not in seen:
             videos.append({"title": title, "link": link})
+        else:
+            print(f"Already seen: {title[:50]}")
 
     print(f"Videos to send: {len(videos)}")
 
